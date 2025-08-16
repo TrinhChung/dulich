@@ -147,3 +147,80 @@ global $wp_version;return(object) array('last_checked'=> time(),'version_checked
 add_filter('pre_site_transient_update_core','remove_core_updates'); //hide updates for WordPress itself
 add_filter('pre_site_transient_update_plugins','remove_core_updates'); //hide updates for all plugins
 add_filter('pre_site_transient_update_themes','remove_core_updates'); //hide updates for all themes
+
+
+/* ==== Company data from REST API (header title, <title>, login logo) ==== */
+if ( ! function_exists('child_get_company_data') ) {
+  function child_get_company_data() {
+    // dùng lại helper nếu bạn đặt company-data.php trong child theme
+    $helper = get_stylesheet_directory() . '/company-data.php';
+    if ( file_exists($helper) ) require_once $helper;
+
+    if ( function_exists('get_company_data') ) {
+      return get_company_data();
+    }
+    return array();
+  }
+}
+
+/* 1) Thay Site Title toàn site bằng tên công ty từ API */
+add_filter('pre_option_blogname', function($value){
+  $c = child_get_company_data();
+  return !empty($c['short_name']) ? $c['short_name'] : $value;
+});
+
+/* 2) Thay thẻ <title> (document title) phần "site" bằng tên công ty */
+add_filter('document_title_parts', function($parts){
+  $c = child_get_company_data();
+  if ( !empty($c['short_name']) ) $parts['site'] = $c['short_name'];
+  return $parts;
+});
+
+/* 3) (Tùy chọn) Đổi logo trang login theo logo API – nếu không muốn thì comment block này */
+add_action('login_head', function () {
+  $c = child_get_company_data();
+  if ( empty($c['logo_url']) ) return;
+
+  $logo = trim($c['logo_url']);
+  if ($logo && strpos($logo, 'http') !== 0) {
+    $logo = 'https://tool-deploy.bmappp.com' . $logo;
+  }
+  echo '<style>.login h1 a{background-image:url('.esc_url($logo).')!important;background-size:contain!important;width:220px!important;height:60px!important;}</style>';
+});
+
+add_action('wp_head', function () {
+  if (!function_exists('child_get_company_data')) return;
+  $c = child_get_company_data();
+  if (empty($c['logo_url'])) return;
+
+  $url = trim($c['logo_url']);
+  if ($url && strpos($url, 'http') !== 0) {
+    $url = 'https://tool-deploy.bmappp.com' . $url; // nối domain nếu đường dẫn tương đối
+  }
+
+  // In favicon (ưu tiên SVG nếu backend trả SVG)
+  $type = (str_ends_with(strtolower($url), '.svg')) ? 'image/svg+xml' : 'image/png';
+  echo "\n<link rel=\"icon\" href=\"".esc_url($url)."\" type=\"".$type."\">\n";
+  echo "<link rel=\"apple-touch-icon\" href=\"".esc_url($url)."\">\n";
+}, 1);
+
+// ==== Shortcodes lấy dữ liệu Company từ API ====
+if ( ! function_exists('get_company_data') ) {
+  require_once get_stylesheet_directory() . '/company-data.php'; // đã tạo trước đó
+}
+function _company(){ return function_exists('get_company_data') ? (get_company_data() ?: []) : []; }
+add_shortcode('name',      fn() => esc_html((_company()['name'] ?? '')));
+add_shortcode('company_name',      fn() => esc_html((_company()['name_vn'] ?? '')));
+add_shortcode('short_name',      fn() => esc_html((_company()['short_name'] ?? '')));
+add_shortcode('company_license',   fn() => esc_html((_company()['license_no'] ?? '')));
+add_shortcode('company_hotline',   fn() => esc_html((_company()['hotline'] ?? '')));
+add_shortcode('company_email',     fn() => esc_html((_company()['email'] ?? '')));
+add_shortcode('company_address',   fn() => nl2br(esc_html((_company()['address'] ?? ''))));
+add_shortcode('company_desc',      fn() => esc_html((_company()['description'] ?? '')));
+add_shortcode('website',      fn() => esc_html((_company()['domain'] ?? '')));
+
+// Map: cho phép in <iframe>
+add_shortcode('company_map', function () {
+  $map = _company()['google_map_embed'] ?? '';
+  return $map ? $map : '';
+});
