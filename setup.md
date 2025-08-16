@@ -75,3 +75,18 @@ server {
 
 sudo nginx -t
 sudo systemctl reload nginx
+
+
+sudo apt update
+sudo apt install -y software-properties-common ca-certificates lsb-release apt-transport-https
+sudo add-apt-repository ppa:ondrej/php -y
+sudo apt update
+
+
+sudo apt install -y php7.4 php7.4-fpm php7.4-mysql \
+php7.4-xml php7.4-mbstring php7.4-curl php7.4-gd \
+php7.4-zip php7.4-intl php7.4-bcmath
+
+sudo systemctl disable --now php8.1-fpm
+sudo systemctl enable --now php7.4-fpm
+sudo systemctl start php7.4-fpm

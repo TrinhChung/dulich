@@ -134,15 +134,9 @@ if (!defined('FORCE_SSL_ADMIN')) {
  *
  * @link https://wordpress.org/support/article/debugging-in-wordpress/
  */
-// Bật chế độ debug
-define( 'WP_DEBUG', true );
-
-// Ghi log lỗi vào file wp-content/debug.log
-define( 'WP_DEBUG_LOG', true );
-
-// Hiện lỗi trực tiếp trên trình duyệt (nếu muốn nhìn ngay)
-define( 'WP_DEBUG_DISPLAY', true );
-@ini_set( 'display_errors', 1 );
+if ( ! defined( 'WP_DEBUG' ) ) {
+	define( 'WP_DEBUG', false );
+}
 
 define( 'FS_METHOD', 'direct' );
 define( 'COOKIEHASH', 'dd07b3661895999c8b53e43bb9ca435c' );
