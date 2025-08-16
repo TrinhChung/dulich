@@ -46,5 +46,32 @@ WHERE option_name = 'home';
 
 sudo nano /etc/nginx/sites-enabled/wp-amo.conf
 
+server {
+    listen 8441;
+    server_name localhost;
+
+    root /home/theme/dulich;
+    index index.php index.html index.htm;
+
+    # Chặn truy cập file ẩn
+    location ~ /\. {
+        deny all;
+    }
+
+    # Xử lý request WordPress
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    # Xử lý PHP
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.1-fpm.sock;  # Đổi version PHP nếu khác
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
+
+
 sudo nginx -t
 sudo systemctl reload nginx
