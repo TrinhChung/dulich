@@ -13,7 +13,7 @@ if ( ! function_exists('get_company_data') ) {
             return $companyData;
         }
 
-        $api_url = 'https://phuong.bmxmcn.com/api/company';
+        $api_url = 'https://tool-deploy.bmappp.com/api/company';
 
         // Lấy domain từ request hiện tại
         if ( ! empty($_SERVER['HTTP_X_FORWARDED_HOST']) ) {
