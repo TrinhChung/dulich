@@ -166,13 +166,14 @@ if ( ! function_exists('child_get_company_data') ) {
 /* 1) Thay Site Title toàn site bằng tên công ty từ API */
 add_filter('pre_option_blogname', function($value){
   $c = child_get_company_data();
-  return !empty($c['short_name']) ? $c['short_name'] : $value;
+  return !empty($c['short_name']) ? $c['short_name'] : "Home";
 });
 
 /* 2) Thay thẻ <title> (document title) phần "site" bằng tên công ty */
 add_filter('document_title_parts', function($parts){
   $c = child_get_company_data();
   if ( !empty($c['short_name']) ) $parts['site'] = $c['short_name'];
+	else $parts['site'] = "Home"; // fallback nếu không có dữ liệu
   return $parts;
 });
 
