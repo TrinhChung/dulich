@@ -92,7 +92,7 @@ if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
 }
 
 // Chuẩn hóa host (bỏ port, lower-case)
-$host = strtolower(preg_replace('/:\d+$/', '', filter_var($raw_host, FILTER_SANITIZE_STRING)));
+$host = strtolower(filter_var($raw_host, FILTER_SANITIZE_STRING));
 
 // Nhận diện HTTPS chính xác khi đứng sau proxy/Cloudflare
 $is_https = (
