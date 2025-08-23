@@ -111,8 +111,9 @@ $scheme = $is_https ? 'https' : 'http';
  */
 $base = '';
 
-define('WP_HOME',    $scheme . '://' . $host . $base);
-define('WP_SITEURL', $scheme . '://' . $host . $base);
+define('WP_HOME',    'http://127.0.0.1:8441');
+define('WP_SITEURL', 'http://127.0.0.1:8441');
+
 
 // Bảo vệ trang quản trị dùng HTTPS (không loop vì đã set $_SERVER['HTTPS']='on' ở trên)
 if (!defined('FORCE_SSL_ADMIN')) {
